@@ -1,0 +1,28 @@
+%{
+#include "hpp.hpp"
+%}
+%option noyywrap
+%option yylineno
+%%
+#[^\n]*\n				{}
+^\.end					{yyterminate();}
+
+def						TOC(Id,DEF)
+ext						TOC(Id,EXT)
+
+if						TOC(Id,IF)
+then					TOC(Id,THEN)
+else					TOC(Id,ELSE)
+
+\;						TOC(Op,SC)
+\,						TOC(Op,COMMA)
+\(						TOC(Op,LP)
+\)						TOC(Op,RP)
+
+[<>+-]					TOC(Op,OP)
+
+[0-9]+					TOC(Num,NUM)
+
+[a-zA-Z0-9]+			TOC(Id,ID)
+[ \t\r\n]+				{}
+%%

@@ -1,0 +1,28 @@
+%{
+#include "hpp.hpp"
+%}
+%defines %union { AST*o; }
+%token <o> ID NUM
+%token <o> DEF EXT IF THEN ELSE
+%token <o> OP LP RP SC COMMA
+%token <o> ADD SUB MUL DIV POW
+%type <o> ex scalar vec
+
+%left ADD SUB
+%%
+REPL : | REPL ex	{ cout << $2->dump() << endl; };
+scalar : ID | NUM | OP | LP | RP ;
+ex : scalar
+	| ex SC			{ $$=$1; }
+	| EXT ex		{ $$=$1; $$->push($2); }
+	| DEF ex ex		{ $$=$1; $$->push($2); $$->push($3); }
+	| ID LP vec RP	{ $$=$1; $$->push($3); }
+	| LP ex RP		{ $$=$2; }
+	| IF ex THEN ex ELSE ex	{ $$=$1; $$->push($2); $$->push($4); $$->push($6);}  
+	| ex OP ex		{ $$=$2; $$->push($1); $$->push($3); }
+;
+vec:				{ $$=new Vector(); }
+	| vec ex		{ $$=$1; $$->push($2); }
+	| vec COMMA ex	{ $$=$1; $$->push($3); }
+;
+%%
